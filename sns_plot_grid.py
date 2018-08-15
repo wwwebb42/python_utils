@@ -20,6 +20,8 @@ def sns_plot_grid(df, cols=3, split_var=None,
         kdeplot and boxplot.
     fg_kwargs are passed to sns.FacetGrid
     **kwargs are passed to sns.map"""
+
+    df = df.copy()
     
 #     Keep only numeric variables, apart from split_var
     df_cols = list(df.select_dtypes('number').columns)
@@ -29,6 +31,10 @@ def sns_plot_grid(df, cols=3, split_var=None,
     
 #     Transpose the dataset
     df_t = df.melt(id_vars=split_var) # Creates new columns called variable and value
+
+    # For safety, convert the split variable to categorical
+    if split_var is not None:
+        df_t[split_var] = df_t[split_var].astype('category')
 
 #     Select variables to plot
     plot_vars = ['value'] 
