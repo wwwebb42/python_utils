@@ -21,6 +21,8 @@ def sns_plot_grid(df, cols=3, split_var=None,
     fg_kwargs are passed to sns.FacetGrid
     **kwargs are passed to sns.map"""
 
+    # Edited, 13:37, 15/08/2018
+
     df = df.copy()
     
 #     Keep only numeric variables, apart from split_var
