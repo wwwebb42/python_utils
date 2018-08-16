@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 #%matplotlib inline
 
-def sns_plot_grid(df, cols=3, split_var=None,
+def sns_plot_grid(df, cols=3, split_var=[],
                   g=None, sns_plot_fn = sns.boxplot, 
                   single_boxplot=False,
                   show_legend=True,
@@ -26,31 +26,35 @@ def sns_plot_grid(df, cols=3, split_var=None,
     
 #     Keep only numeric variables, apart from split_var
     df_cols = list(df.select_dtypes('number').columns)
-    if (split_var is not None) and (split_var not in df_cols):
-        df_cols.append(split_var)
+    
+#    Add split vars to column list
+    df_cols += [v for v in split_var if v not in df_cols]
+    
     df = df[df_cols]
     
 #     Transpose the dataset
     df_t = df.melt(id_vars=split_var) # Creates new columns called variable and value
 
     # For safety, convert the split variable to categorical
-    if split_var is not None:
-        df_t[split_var] = df_t[split_var].astype('category')
+    for v in split_var:
+        df_t[v] = df_t[v].astype('category')
 
 #     Select variables to plot
     plot_vars = ['value'] 
     facet_var='variable' 
-    hue=split_var
     
-#     Adjustments for boxplot
+#     Adjustments for different kinds of plot - especially the split variables
     if sns_plot_fn in [sns.boxplot, sns.violinplot]:
         hue=None    
         if single_boxplot:
             facet_var=None
             cols=None
             plot_vars.append('variable')
-        elif split_var is not None:
-            plot_vars.append(split_var)
+        elif len(split_var) > 0:
+            plot_vars += split_var
+    else:
+        if len(split_var) > 0:
+            hue = split_var.pop(0)
 
     if g is None:
         g = sns.FacetGrid(df_t, col=facet_var, hue=hue, col_wrap=cols, legend_out=False, **fg_kwargs)
@@ -80,16 +84,21 @@ if __name__ == "__main__":
     df = pd.concat([df, group, group2], axis=1)
     df.info()
 
-    sns_plot_grid(df)
-    plt.show()
-    
+#    sns_plot_grid(df)
+#    plt.show()
+#    
     g = sns_plot_grid(df, sns_plot_fn=sns.kdeplot, 
-                  split_var='group',
+                  split_var=['group'],
+                  fg_kwargs=dict(sharex=False, sharey=False)
+                 )
+
+    g = sns_plot_grid(df, sns_plot_fn=sns.boxplot, 
+                  split_var=['group', 'group2'],
                   fg_kwargs=dict(sharex=False, sharey=False)
                  )
 
     g = sns_plot_grid(df, 
-                  split_var='group',
+                  split_var=['group'],
                   sns_plot_fn=sns.violinplot, 
                   fg_kwargs=dict(sharex=False, sharey=False),
                   inner='quart'
