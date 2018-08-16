@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+#%matplotlib inline
 
 def sns_plot_grid(df, cols=3, split_var=None,
                   g=None, sns_plot_fn = sns.boxplot, 
@@ -20,8 +21,6 @@ def sns_plot_grid(df, cols=3, split_var=None,
         kdeplot and boxplot.
     fg_kwargs are passed to sns.FacetGrid
     **kwargs are passed to sns.map"""
-
-    # Edited, 13:37, 15/08/2018
 
     df = df.copy()
     
@@ -68,3 +67,30 @@ def sns_plot_grid(df, cols=3, split_var=None,
     if show_legend:
         plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
     return g
+
+
+
+# A few tests...
+if __name__ == "__main__":
+    
+    np.random.seed(123)
+    df = pd.DataFrame(np.random.randn(500).reshape(100,5), columns=list('abcde'))
+    group = pd.Series(np.random.choice([True, False], 100, replace=True, p=[0.5, 0.5]), name = 'group')
+    group2 = pd.Series(np.random.choice([True, False], 100, replace=True, p=[0.5, 0.5]), name = 'group2')
+    df = pd.concat([df, group, group2], axis=1)
+    df.info()
+
+    sns_plot_grid(df)
+    plt.show()
+    
+    g = sns_plot_grid(df, sns_plot_fn=sns.kdeplot, 
+                  split_var='group',
+                  fg_kwargs=dict(sharex=False, sharey=False)
+                 )
+
+    g = sns_plot_grid(df, 
+                  split_var='group',
+                  sns_plot_fn=sns.violinplot, 
+                  fg_kwargs=dict(sharex=False, sharey=False),
+                  inner='quart'
+                 )
