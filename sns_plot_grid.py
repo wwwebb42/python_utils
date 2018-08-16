@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 #%matplotlib inline
 
-def sns_plot_grid(df, cols=3, split_var=[],
+def sns_plot_grid(df, cols=3, split_vars=[],
                   g=None, sns_plot_fn = sns.boxplot, 
                   single_boxplot=False,
                   show_legend=True,
@@ -14,29 +14,31 @@ def sns_plot_grid(df, cols=3, split_var=[],
     
     """Plots various types of seaborn distribution plot on a grid, with one plot per column.
     Takes a dataframe, and returns a Seaborn FacetGrid object.
-    split_var = A column which splits the output further. For histograms, kde plots etc, this will
-        give a different colour of line, bar etc on each plot for each value of split_var. For 
-        boxplots, split_var will be the y axis of each plot.
-    sns_plot_fn is the seaborn plotting function to use. So far, I've tested it with distplot, 
+    split_vars = A list of one or two columns that split the output further. 
+        For histograms, kde plots etc, this will give a different colour of 
+        line, bar etc on each plot for each value of split_vars. For 
+        boxplots, the first variable in split_vars will be the y axis of each
+        plot, and the second with create groups within each y value.
+    sns_plot_fn = the seaborn plotting function to use. So far, I've tested it with distplot, 
         kdeplot and boxplot.
     fg_kwargs are passed to sns.FacetGrid
     **kwargs are passed to sns.map"""
 
     df = df.copy()
     
-#     Keep only numeric variables, apart from split_var
+#     Keep only numeric variables, apart from split_vars
     df_cols = list(df.select_dtypes('number').columns)
     
 #    Add split vars to column list
-    df_cols += [v for v in split_var if v not in df_cols]
+    df_cols += [v for v in split_vars if v not in df_cols]
     
     df = df[df_cols]
     
 #     Transpose the dataset
-    df_t = df.melt(id_vars=split_var) # Creates new columns called variable and value
+    df_t = df.melt(id_vars=split_vars) # Creates new columns called variable and value
 
     # For safety, convert the split variable to categorical
-    for v in split_var:
+    for v in split_vars:
         df_t[v] = df_t[v].astype('category')
 
 #     Select variables to plot
@@ -50,11 +52,11 @@ def sns_plot_grid(df, cols=3, split_var=[],
             facet_var=None
             cols=None
             plot_vars.append('variable')
-        elif len(split_var) > 0:
-            plot_vars += split_var
+        elif len(split_vars) > 0:
+            plot_vars += split_vars
     else:
-        if len(split_var) > 0:
-            hue = split_var.pop(0)
+        if len(split_vars) > 0:
+            hue = split_vars.pop(0)
 
     if g is None:
         g = sns.FacetGrid(df_t, col=facet_var, hue=hue, col_wrap=cols, legend_out=False, **fg_kwargs)
@@ -88,17 +90,17 @@ if __name__ == "__main__":
 #    plt.show()
 #    
     g = sns_plot_grid(df, sns_plot_fn=sns.kdeplot, 
-                  split_var=['group'],
+                  split_vars=['group'],
                   fg_kwargs=dict(sharex=False, sharey=False)
                  )
 
     g = sns_plot_grid(df, sns_plot_fn=sns.boxplot, 
-                  split_var=['group', 'group2'],
+                  split_vars=['group', 'group2'],
                   fg_kwargs=dict(sharex=False, sharey=False)
                  )
 
     g = sns_plot_grid(df, 
-                  split_var=['group'],
+                  split_vars=['group'],
                   sns_plot_fn=sns.violinplot, 
                   fg_kwargs=dict(sharex=False, sharey=False),
                   inner='quart'
