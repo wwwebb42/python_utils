@@ -59,7 +59,8 @@ def sns_plot_grid(df, cols=3, split_vars=[],
             hue = split_vars.pop(0)
 
     if g is None:
-        g = sns.FacetGrid(df_t, col=facet_var, hue=hue, col_wrap=cols, legend_out=False, **fg_kwargs)
+        g = sns.FacetGrid(df_t, col=facet_var, hue=hue, col_wrap=cols, 
+                          legend_out=False, **fg_kwargs)
         
     g.map(sns_plot_fn, *plot_vars, **kwargs)
     
@@ -81,8 +82,10 @@ if __name__ == "__main__":
     
     np.random.seed(123)
     df = pd.DataFrame(np.random.randn(500).reshape(100,5), columns=list('abcde'))
-    group = pd.Series(np.random.choice([True, False], 100, replace=True, p=[0.5, 0.5]), name = 'group')
-    group2 = pd.Series(np.random.choice([True, False], 100, replace=True, p=[0.5, 0.5]), name = 'group2')
+    group = pd.Series(np.random.choice([True, False], 100, 
+                                        replace=True, p=[0.5, 0.5]), name = 'group')
+    group2 = pd.Series(np.random.choice([True, False], 100, 
+                                        replace=True, p=[0.5, 0.5]), name = 'group2')
     df = pd.concat([df, group, group2], axis=1)
     df.info()
 
@@ -105,3 +108,5 @@ if __name__ == "__main__":
                   fg_kwargs=dict(sharex=False, sharey=False),
                   inner='quart'
                  )
+    
+    

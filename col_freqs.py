@@ -16,7 +16,8 @@ def col_freqs(df, include_if_nunique_le=100, max_cats=10, print_output=True):
     
     out = []
     
-#     Include all object columns, and any other with fewer than xxx values, regardless of their type
+#     Include all object columns, and any other with fewer than xxx values, 
+#     regardless of their type
     col_list = df.columns[(df.nunique() <= include_if_nunique_le) | (df.dtypes == 'object')]
     
 #     for col in df.select_dtypes(include=['object']).columns:
@@ -38,7 +39,8 @@ def col_freqs(df, include_if_nunique_le=100, max_cats=10, print_output=True):
         cum_rc = np.array([vc_r_cum[z] for z in vc_r])
             
         # Label any categories with a rank > max_cats as 'Other'
-        cats_with_other = np.where(cum_rc <= max_cats, [vc.index[i] for i, c in enumerate(cum_rc)], 'Other')
+        cats_with_other = np.where(cum_rc <= max_cats, 
+                                   [vc.index[i] for i, c in enumerate(cum_rc)], 'Other')
         
         # Calculate number of observations, and % of total
         f = pd.DataFrame({'category' : cats_with_other, 'obs' : vc})
@@ -70,7 +72,17 @@ def col_freqs(df, include_if_nunique_le=100, max_cats=10, print_output=True):
     if print_output:
         for c in outdf.index.levels[0]:
             print('*** {} ***'.format(c))
-            print('Number of unique values: ', df[c].nunique(), '\n')
+            print('Number of unique values: ', df[c].nunique())
+            print('Percent missing: {:5.2f}'.format((1- (df[c].count() / len(df[c]))) * 100 ), '\n')
             print(outdf.loc[c], '\n')
     else:
         return pd.concat(out)
+
+
+if __name__ == '__main__':
+    import seaborn as sns
+#    sns.get_dataset_names()
+    data = sns.load_dataset('titanic')
+    col_freqs(data)
+
+
