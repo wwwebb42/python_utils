@@ -63,7 +63,7 @@ def col_freqs(df, include_if_nunique_le=100, max_cats=10, print_output=True):
         z.drop('ranks', axis=1, inplace=True)
  
         # Add the column name as the first level in the multi-index
-        z = pd.concat([z], keys=[col], names=['Column name'])
+        z = pd.concat([z], keys=[col], names=['column_name'])
 
         out.append(z)
     
@@ -75,14 +75,13 @@ def col_freqs(df, include_if_nunique_le=100, max_cats=10, print_output=True):
             print('Number of unique values: ', df[c].nunique())
             print('Percent missing: {:5.2f}'.format((1- (df[c].count() / len(df[c]))) * 100 ), '\n')
             print(outdf.loc[c], '\n')
-    else:
-        return pd.concat(out)
+
+    return pd.concat(out)
 
 
 if __name__ == '__main__':
     import seaborn as sns
-#    sns.get_dataset_names()
     data = sns.load_dataset('titanic')
-    col_freqs(data)
+    data_stats = col_freqs(data)
 
 

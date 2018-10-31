@@ -14,13 +14,18 @@ def sns_plot_grid(df, cols=3, split_vars=[],
     
     """Plots various types of seaborn distribution plot on a grid, with one plot per column.
     Takes a dataframe, and returns a Seaborn FacetGrid object.
+    
+    Replaces distribution_plots.py
+    
     split_vars = A list of one or two columns that split the output further. 
         For histograms, kde plots etc, this will give a different colour of 
         line, bar etc on each plot for each value of split_vars. For 
         boxplots, the first variable in split_vars will be the y axis of each
         plot, and the second with create groups within each y value.
+        
     sns_plot_fn = the seaborn plotting function to use. So far, I've tested it with distplot, 
         kdeplot and boxplot.
+        
     fg_kwargs are passed to sns.FacetGrid
     **kwargs are passed to sns.map"""
 
